@@ -1,0 +1,41 @@
+# Project-local ignores for mctp-bridge
+
+# Build output
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+progress.marks
+
+# Binaries
+mctp-bridge
+virt-serial
+
+# Test binaries
+build/tests/
+build/tests/*
+
+# Object files and archives
+*.o
+*.a
+*.so
+*.out
+
+# PTY/socket/test artifacts
+*.sock
+/tmp/virt-serial-*.sock
+
+# Editor and system files
+*.swp
+*~
+.vscode/
+.idea/
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Keep generated test data out of version control unless intentionally added
+# tests/mctp_random_messages.json
