@@ -1,1 +1,0 @@
-/usr/bin/c++ "CMakeFiles/mctp-bridge.dir/mctp-bridge.cpp.o" -o mctp-bridge  -Wl,-rpath,/home/doug/git/mctp-serial-linux/build/linux-mctp/libsermctp/src: ../../libsermctp/src/libsermctp.so.1.0.0 -lnl-genl-3 -lnl-route-3 -lnl-3
