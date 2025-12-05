@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/doug/git/mctp-serial-linux/linux-mctp/mctp-bridge/src/mctp-bridge.cpp" "mctp-bridge-src/CMakeFiles/mctp-bridge.dir/__/src/mctp-bridge.cpp.o" "gcc" "mctp-bridge-src/CMakeFiles/mctp-bridge.dir/__/src/mctp-bridge.cpp.o.d"
+  "/home/doug/git/mctp-serial-linux/linux-mctp/mctp-bridge/src/mctp-bridge.cpp" "linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/mctp-bridge.cpp.o" "gcc" "linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/mctp-bridge.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

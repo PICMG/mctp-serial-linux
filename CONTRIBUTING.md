@@ -1,6 +1,6 @@
-# Contributing to IoTorch
+# Contributing
 
-Welcome! We're thrilled you're considering contributing to **IoTorch**, a powerful framework for robust, industrial IoT communications. Whether you're fixing bugs, improving documentation, or proposing new features—your input is valued.
+Welcome! We're thrilled you're considering contributing to this project. Whether you're fixing bugs, improving documentation, or proposing new features—your input is valued.
 
 ---
 
@@ -19,8 +19,7 @@ Welcome! We're thrilled you're considering contributing to **IoTorch**, a powerf
 
 By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md). We are committed to fostering a welcoming and inclusive environment.
 
-In addition, we require tat all contributors also sign the [Contributor License Agreement](IoTorch_Contributor_License_Agreement.pdf). Please submit the completed agreement to the community moderator (doug@picmg.org)
-
+In addition, we require that all contributors also sign the Contributor License Agreement found on the [IoTFoundry site](https://picmg.github.io/iot-foundry). Please submit the completed agreement to the community moderator (doug@picmg.org)
 
 ---
 
@@ -39,7 +38,7 @@ In addition, we require tat all contributors also sign the [Contributor License 
 1. **Fork** the repository
 2. **Clone** your fork locally:
    ```bash
-   git clone https://github.com/PICMG/IoTorch.git 
+   git clone https://github.com/PICMG/mctp-serial-linux.git 
 ## Coding Guidelines
 This project creates code for multiple different embedded hardware platforms and developement envioronments. Code for these specific environments is expected to follow the Style Guide for that platform.
 
@@ -72,8 +71,8 @@ Go to the main repository on GitHub and click the **Fork** button in the top-rig
 Open your terminal and run:
 
 ```bash
-git clone https://github.com/PICMG/IoTorch.git
-cd IoTorch
+git clone https://github.com/PICMG/mctp-serial-linux.git
+cd mctp-serial-linux
 ```
 
 
@@ -141,14 +140,14 @@ Before submitting your pull request, make sure:
 ## Reporting Issues
 Please check the following before opening a new issue:
 
-- [ ] Search [existing issues](https://github.com/PICMG/IoTorch/issues) to see if your concern has already been reported or addressed.
+- [ ] Search [existing issues](https://github.com/PICMG/mctp-serial-linux/issues) to see if your concern has already been reported or addressed.
 - [ ] Make sure you're using the latest version of the project.
 - [ ] Review the project's `README.md`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md` for guidance.
 
 ### How to Submit an Issue
 Follow these steps to submit a new issue:
 
-1. Go to the [Issues tab](https://github.com/PICMG/IoTorch/issues) of the repository.
+1. Go to the [Issues tab](https://github.com/PICMG/mctp-serial-linux/issues) of the repository.
 2. Click the **New Issue** button.
 3. Choose the appropriate issue template (if available).
 4. Fill out the issue form with the following details:

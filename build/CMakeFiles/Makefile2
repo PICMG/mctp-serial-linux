@@ -64,17 +64,17 @@ CMAKE_BINARY_DIR = /home/doug/git/mctp-serial-linux/build
 
 # The main recursive "all" target.
 all: linux-mctp/libsermctp/all
-all: linux-mctp/mctp-bridge-wrapper/all
+all: linux-mctp/mctp-bridge/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
 preinstall: linux-mctp/libsermctp/preinstall
-preinstall: linux-mctp/mctp-bridge-wrapper/preinstall
+preinstall: linux-mctp/mctp-bridge/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
 clean: linux-mctp/libsermctp/clean
-clean: linux-mctp/mctp-bridge-wrapper/clean
+clean: linux-mctp/mctp-bridge/clean
 .PHONY : clean
 
 #=============================================================================
@@ -97,46 +97,63 @@ linux-mctp/libsermctp/clean: linux-mctp/libsermctp/src/clean
 
 # Recursive "all" directory target.
 linux-mctp/libsermctp/src/all: linux-mctp/libsermctp/src/CMakeFiles/sermctp.dir/all
+linux-mctp/libsermctp/src/all: linux-mctp/libsermctp/src/tests/all
 .PHONY : linux-mctp/libsermctp/src/all
 
 # Recursive "preinstall" directory target.
-linux-mctp/libsermctp/src/preinstall:
+linux-mctp/libsermctp/src/preinstall: linux-mctp/libsermctp/src/tests/preinstall
 .PHONY : linux-mctp/libsermctp/src/preinstall
 
 # Recursive "clean" directory target.
 linux-mctp/libsermctp/src/clean: linux-mctp/libsermctp/src/CMakeFiles/sermctp.dir/clean
 linux-mctp/libsermctp/src/clean: linux-mctp/libsermctp/src/CMakeFiles/install-app.dir/clean
+linux-mctp/libsermctp/src/clean: linux-mctp/libsermctp/src/tests/clean
 .PHONY : linux-mctp/libsermctp/src/clean
 
 #=============================================================================
-# Directory level rules for directory linux-mctp/mctp-bridge-wrapper
+# Directory level rules for directory linux-mctp/libsermctp/src/tests
 
 # Recursive "all" directory target.
-linux-mctp/mctp-bridge-wrapper/all: mctp-bridge-src/all
-.PHONY : linux-mctp/mctp-bridge-wrapper/all
+linux-mctp/libsermctp/src/tests/all: linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/all
+.PHONY : linux-mctp/libsermctp/src/tests/all
 
 # Recursive "preinstall" directory target.
-linux-mctp/mctp-bridge-wrapper/preinstall: mctp-bridge-src/preinstall
-.PHONY : linux-mctp/mctp-bridge-wrapper/preinstall
+linux-mctp/libsermctp/src/tests/preinstall:
+.PHONY : linux-mctp/libsermctp/src/tests/preinstall
 
 # Recursive "clean" directory target.
-linux-mctp/mctp-bridge-wrapper/clean: mctp-bridge-src/clean
-.PHONY : linux-mctp/mctp-bridge-wrapper/clean
+linux-mctp/libsermctp/src/tests/clean: linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/clean
+.PHONY : linux-mctp/libsermctp/src/tests/clean
 
 #=============================================================================
-# Directory level rules for directory mctp-bridge-src
+# Directory level rules for directory linux-mctp/mctp-bridge
 
 # Recursive "all" directory target.
-mctp-bridge-src/all: mctp-bridge-src/CMakeFiles/mctp-bridge.dir/all
-.PHONY : mctp-bridge-src/all
+linux-mctp/mctp-bridge/all: linux-mctp/mctp-bridge/src/all
+.PHONY : linux-mctp/mctp-bridge/all
 
 # Recursive "preinstall" directory target.
-mctp-bridge-src/preinstall:
-.PHONY : mctp-bridge-src/preinstall
+linux-mctp/mctp-bridge/preinstall: linux-mctp/mctp-bridge/src/preinstall
+.PHONY : linux-mctp/mctp-bridge/preinstall
 
 # Recursive "clean" directory target.
-mctp-bridge-src/clean: mctp-bridge-src/CMakeFiles/mctp-bridge.dir/clean
-.PHONY : mctp-bridge-src/clean
+linux-mctp/mctp-bridge/clean: linux-mctp/mctp-bridge/src/clean
+.PHONY : linux-mctp/mctp-bridge/clean
+
+#=============================================================================
+# Directory level rules for directory linux-mctp/mctp-bridge/src
+
+# Recursive "all" directory target.
+linux-mctp/mctp-bridge/src/all: linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/all
+.PHONY : linux-mctp/mctp-bridge/src/all
+
+# Recursive "preinstall" directory target.
+linux-mctp/mctp-bridge/src/preinstall:
+.PHONY : linux-mctp/mctp-bridge/src/preinstall
+
+# Recursive "clean" directory target.
+linux-mctp/mctp-bridge/src/clean: linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/clean
+.PHONY : linux-mctp/mctp-bridge/src/clean
 
 #=============================================================================
 # Target rules for target linux-mctp/libsermctp/src/CMakeFiles/sermctp.dir
@@ -191,30 +208,56 @@ linux-mctp/libsermctp/src/CMakeFiles/install-app.dir/clean:
 .PHONY : linux-mctp/libsermctp/src/CMakeFiles/install-app.dir/clean
 
 #=============================================================================
-# Target rules for target mctp-bridge-src/CMakeFiles/mctp-bridge.dir
+# Target rules for target linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir
 
 # All Build rule for target.
-mctp-bridge-src/CMakeFiles/mctp-bridge.dir/all: linux-mctp/libsermctp/src/CMakeFiles/sermctp.dir/all
-	$(MAKE) $(MAKESILENT) -f mctp-bridge-src/CMakeFiles/mctp-bridge.dir/build.make mctp-bridge-src/CMakeFiles/mctp-bridge.dir/depend
-	$(MAKE) $(MAKESILENT) -f mctp-bridge-src/CMakeFiles/mctp-bridge.dir/build.make mctp-bridge-src/CMakeFiles/mctp-bridge.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/doug/git/mctp-serial-linux/build/CMakeFiles --progress-num=2,3 "Built target mctp-bridge"
-.PHONY : mctp-bridge-src/CMakeFiles/mctp-bridge.dir/all
+linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/all: linux-mctp/libsermctp/src/CMakeFiles/sermctp.dir/all
+	$(MAKE) $(MAKESILENT) -f linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/build.make linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/depend
+	$(MAKE) $(MAKESILENT) -f linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/build.make linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/doug/git/mctp-serial-linux/build/CMakeFiles --progress-num=10,11,12,13,14,15,16,17,18 "Built target test_runner"
+.PHONY : linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/all
 
 # Build rule for subdir invocation for target.
-mctp-bridge-src/CMakeFiles/mctp-bridge.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/doug/git/mctp-serial-linux/build/CMakeFiles 8
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 mctp-bridge-src/CMakeFiles/mctp-bridge.dir/all
+linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/doug/git/mctp-serial-linux/build/CMakeFiles 15
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/doug/git/mctp-serial-linux/build/CMakeFiles 0
-.PHONY : mctp-bridge-src/CMakeFiles/mctp-bridge.dir/rule
+.PHONY : linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/rule
 
 # Convenience name for target.
-mctp-bridge: mctp-bridge-src/CMakeFiles/mctp-bridge.dir/rule
+test_runner: linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/rule
+.PHONY : test_runner
+
+# clean rule for target.
+linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/clean:
+	$(MAKE) $(MAKESILENT) -f linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/build.make linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/clean
+.PHONY : linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/clean
+
+#=============================================================================
+# Target rules for target linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir
+
+# All Build rule for target.
+linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/all: linux-mctp/libsermctp/src/CMakeFiles/sermctp.dir/all
+	$(MAKE) $(MAKESILENT) -f linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/build.make linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/depend
+	$(MAKE) $(MAKESILENT) -f linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/build.make linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/doug/git/mctp-serial-linux/build/CMakeFiles --progress-num=2,3 "Built target mctp-bridge"
+.PHONY : linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/all
+
+# Build rule for subdir invocation for target.
+linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/doug/git/mctp-serial-linux/build/CMakeFiles 8
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/doug/git/mctp-serial-linux/build/CMakeFiles 0
+.PHONY : linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/rule
+
+# Convenience name for target.
+mctp-bridge: linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/rule
 .PHONY : mctp-bridge
 
 # clean rule for target.
-mctp-bridge-src/CMakeFiles/mctp-bridge.dir/clean:
-	$(MAKE) $(MAKESILENT) -f mctp-bridge-src/CMakeFiles/mctp-bridge.dir/build.make mctp-bridge-src/CMakeFiles/mctp-bridge.dir/clean
-.PHONY : mctp-bridge-src/CMakeFiles/mctp-bridge.dir/clean
+linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/clean:
+	$(MAKE) $(MAKESILENT) -f linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/build.make linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/clean
+.PHONY : linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

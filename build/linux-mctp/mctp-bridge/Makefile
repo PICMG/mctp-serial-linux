@@ -132,14 +132,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/doug/git/mctp-serial-linux/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/doug/git/mctp-serial-linux/build/CMakeFiles /home/doug/git/mctp-serial-linux/build/mctp-bridge-src//CMakeFiles/progress.marks
-	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 mctp-bridge-src/all
+	cd /home/doug/git/mctp-serial-linux/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/doug/git/mctp-serial-linux/build/CMakeFiles /home/doug/git/mctp-serial-linux/build/linux-mctp/mctp-bridge//CMakeFiles/progress.marks
+	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 linux-mctp/mctp-bridge/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/doug/git/mctp-serial-linux/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 mctp-bridge-src/clean
+	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 linux-mctp/mctp-bridge/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,12 +148,12 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 mctp-bridge-src/preinstall
+	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 linux-mctp/mctp-bridge/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 mctp-bridge-src/preinstall
+	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 linux-mctp/mctp-bridge/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
@@ -161,44 +161,6 @@ depend:
 	cd /home/doug/git/mctp-serial-linux/build && $(CMAKE_COMMAND) -P /home/doug/git/mctp-serial-linux/build/CMakeFiles/VerifyGlobs.cmake
 	cd /home/doug/git/mctp-serial-linux/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
-
-# Convenience name for target.
-mctp-bridge-src/CMakeFiles/mctp-bridge.dir/rule:
-	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 mctp-bridge-src/CMakeFiles/mctp-bridge.dir/rule
-.PHONY : mctp-bridge-src/CMakeFiles/mctp-bridge.dir/rule
-
-# Convenience name for target.
-mctp-bridge: mctp-bridge-src/CMakeFiles/mctp-bridge.dir/rule
-.PHONY : mctp-bridge
-
-# fast build rule for target.
-mctp-bridge/fast:
-	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f mctp-bridge-src/CMakeFiles/mctp-bridge.dir/build.make mctp-bridge-src/CMakeFiles/mctp-bridge.dir/build
-.PHONY : mctp-bridge/fast
-
-__/src/mctp-bridge.o: __/src/mctp-bridge.cpp.o
-.PHONY : __/src/mctp-bridge.o
-
-# target to build an object file
-__/src/mctp-bridge.cpp.o:
-	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f mctp-bridge-src/CMakeFiles/mctp-bridge.dir/build.make mctp-bridge-src/CMakeFiles/mctp-bridge.dir/__/src/mctp-bridge.cpp.o
-.PHONY : __/src/mctp-bridge.cpp.o
-
-__/src/mctp-bridge.i: __/src/mctp-bridge.cpp.i
-.PHONY : __/src/mctp-bridge.i
-
-# target to preprocess a source file
-__/src/mctp-bridge.cpp.i:
-	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f mctp-bridge-src/CMakeFiles/mctp-bridge.dir/build.make mctp-bridge-src/CMakeFiles/mctp-bridge.dir/__/src/mctp-bridge.cpp.i
-.PHONY : __/src/mctp-bridge.cpp.i
-
-__/src/mctp-bridge.s: __/src/mctp-bridge.cpp.s
-.PHONY : __/src/mctp-bridge.s
-
-# target to generate assembly for a file
-__/src/mctp-bridge.cpp.s:
-	cd /home/doug/git/mctp-serial-linux/build && $(MAKE) $(MAKESILENT) -f mctp-bridge-src/CMakeFiles/mctp-bridge.dir/build.make mctp-bridge-src/CMakeFiles/mctp-bridge.dir/__/src/mctp-bridge.cpp.s
-.PHONY : __/src/mctp-bridge.cpp.s
 
 # Help Target
 help:
@@ -212,10 +174,6 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... mctp-bridge"
-	@echo "... __/src/mctp-bridge.o"
-	@echo "... __/src/mctp-bridge.i"
-	@echo "... __/src/mctp-bridge.s"
 .PHONY : help
 
 

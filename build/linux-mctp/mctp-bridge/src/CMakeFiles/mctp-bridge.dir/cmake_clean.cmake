@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/mctp-bridge.dir/__/src/mctp-bridge.cpp.o"
-  "CMakeFiles/mctp-bridge.dir/__/src/mctp-bridge.cpp.o.d"
+  "CMakeFiles/mctp-bridge.dir/mctp-bridge.cpp.o"
+  "CMakeFiles/mctp-bridge.dir/mctp-bridge.cpp.o.d"
   "mctp-bridge"
   "mctp-bridge.pdb"
 )

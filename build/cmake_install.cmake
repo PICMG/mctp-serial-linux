@@ -49,7 +49,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/doug/git/mctp-serial-linux/build/linux-mctp/mctp-bridge-wrapper/cmake_install.cmake")
+  include("/home/doug/git/mctp-serial-linux/build/linux-mctp/mctp-bridge/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)

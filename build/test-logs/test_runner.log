@@ -1,0 +1,29 @@
+[ RUN ] BcastMessenger_setup
+[ PASS ] BcastMessenger_setup
+[ RUN ] BcastMessenger_transfer
+BcastMessenger transfer test starting
+BcastMessenger transfer test PASSED
+[ PASS ] BcastMessenger_transfer
+[ RUN ] MctpFramer_basic
+[ PASS ] MctpFramer_basic
+[ RUN ] MctpFramer_decode
+[ PASS ] MctpFramer_decode
+[ RUN ] MctpNetlink_no_crash
+interface not found: none
+[ PASS ] MctpNetlink_no_crash
+[ RUN ] MctpBridge_construct
+[ PASS ] MctpBridge_construct
+[ RUN ] bridge_stress
+[PASS] All transmitted messages were received successfully.
+[ PASS ] bridge_stress
+[ RUN ] linuxserial
+Initialized LinuxMctpSerial devices: mctpserial0 and mctpserial1
+Sent packets on both interfaces, now waiting to receive...
+epoll_wait returned 1 events
+Received 7 bytes on interface 1: 1 9 8 c8 1 55 aa 
+epoll_wait returned 1 events
+Received 7 bytes on interface 0: 1 8 9 c8 2 66 bb 
+Successfully received both messages (PASS)
+[ PASS ] linuxserial
+
+Summary: 8 / 8 tests passed.

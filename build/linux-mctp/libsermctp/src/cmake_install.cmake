@@ -106,3 +106,8 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/doug/git/mctp-serial-linux/build/linux-mctp/libsermctp/src/sermctp.pc")
 endif()
 
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/doug/git/mctp-serial-linux/build/linux-mctp/libsermctp/src/tests/cmake_install.cmake")
+endif()
+

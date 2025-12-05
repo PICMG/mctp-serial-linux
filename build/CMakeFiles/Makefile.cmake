@@ -98,8 +98,9 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/CMakeLists.txt"
   "/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/sermctp.pc.in"
   "/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/src/CMakeLists.txt"
-  "/home/doug/git/mctp-serial-linux/linux-mctp/mctp-bridge-wrapper/CMakeLists.txt"
-  "/home/doug/git/mctp-serial-linux/linux-mctp/mctp-bridge/clean_src/CMakeLists.txt"
+  "/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/tests/CMakeLists.txt"
+  "/home/doug/git/mctp-serial-linux/linux-mctp/mctp-bridge/CMakeLists.txt"
+  "/home/doug/git/mctp-serial-linux/linux-mctp/mctp-bridge/src/CMakeLists.txt"
   )
 
 # The corresponding makefile is:
@@ -117,13 +118,15 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "linux-mctp/libsermctp/CMakeFiles/CMakeDirectoryInformation.cmake"
   "linux-mctp/libsermctp/src/sermctp.pc"
   "linux-mctp/libsermctp/src/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "linux-mctp/mctp-bridge-wrapper/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "mctp-bridge-src/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "linux-mctp/libsermctp/src/tests/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "linux-mctp/mctp-bridge/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "linux-mctp/mctp-bridge/src/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "linux-mctp/libsermctp/src/CMakeFiles/sermctp.dir/DependInfo.cmake"
   "linux-mctp/libsermctp/src/CMakeFiles/install-app.dir/DependInfo.cmake"
-  "mctp-bridge-src/CMakeFiles/mctp-bridge.dir/DependInfo.cmake"
+  "linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/DependInfo.cmake"
+  "linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/DependInfo.cmake"
   )

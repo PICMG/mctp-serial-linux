@@ -24,7 +24,7 @@ BUILD_LIB:BOOL=ON
 BUILD_STATIC_LIBS:BOOL=OFF
 
 //Build unit/integration tests
-BUILD_TESTS:BOOL=OFF
+BUILD_TESTS:BOOL=ON
 
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
@@ -218,6 +218,15 @@ PKG_CONFIG_EXECUTABLE:FILEPATH=/usr/bin/pkg-config
 USE_SYSTEM_SERMCTP:BOOL=OFF
 
 //Value Computed by CMake
+libsermctp-tests_BINARY_DIR:STATIC=/home/doug/git/mctp-serial-linux/build/linux-mctp/libsermctp/src/tests
+
+//Value Computed by CMake
+libsermctp-tests_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+libsermctp-tests_SOURCE_DIR:STATIC=/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/tests
+
+//Value Computed by CMake
 libsermctp_BINARY_DIR:STATIC=/home/doug/git/mctp-serial-linux/build/linux-mctp/libsermctp
 
 //Value Computed by CMake
@@ -227,13 +236,13 @@ libsermctp_IS_TOP_LEVEL:STATIC=OFF
 libsermctp_SOURCE_DIR:STATIC=/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp
 
 //Value Computed by CMake
-mctp-bridge-wrapper_BINARY_DIR:STATIC=/home/doug/git/mctp-serial-linux/build/linux-mctp/mctp-bridge-wrapper
+mctp-bridge_BINARY_DIR:STATIC=/home/doug/git/mctp-serial-linux/build/linux-mctp/mctp-bridge
 
 //Value Computed by CMake
-mctp-bridge-wrapper_IS_TOP_LEVEL:STATIC=OFF
+mctp-bridge_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-mctp-bridge-wrapper_SOURCE_DIR:STATIC=/home/doug/git/mctp-serial-linux/linux-mctp/mctp-bridge-wrapper
+mctp-bridge_SOURCE_DIR:STATIC=/home/doug/git/mctp-serial-linux/linux-mctp/mctp-bridge
 
 //Value Computed by CMake
 mctp-listener_BINARY_DIR:STATIC=/home/doug/git/mctp-serial-linux/build/linux-mctp/libsermctp/src
@@ -353,7 +362,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=5
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

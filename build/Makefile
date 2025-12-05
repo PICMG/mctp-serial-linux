@@ -189,6 +189,19 @@ install-app/fast:
 .PHONY : install-app/fast
 
 #=============================================================================
+# Target rules for targets named test_runner
+
+# Build rule for target.
+test_runner: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_runner
+.PHONY : test_runner
+
+# fast build rule for target.
+test_runner/fast:
+	$(MAKE) $(MAKESILENT) -f linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/build.make linux-mctp/libsermctp/src/tests/CMakeFiles/test_runner.dir/build
+.PHONY : test_runner/fast
+
+#=============================================================================
 # Target rules for targets named mctp-bridge
 
 # Build rule for target.
@@ -198,7 +211,7 @@ mctp-bridge: cmake_check_build_system
 
 # fast build rule for target.
 mctp-bridge/fast:
-	$(MAKE) $(MAKESILENT) -f mctp-bridge-src/CMakeFiles/mctp-bridge.dir/build.make mctp-bridge-src/CMakeFiles/mctp-bridge.dir/build
+	$(MAKE) $(MAKESILENT) -f linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/build.make linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/build
 .PHONY : mctp-bridge/fast
 
 # Help Target
@@ -216,6 +229,7 @@ help:
 	@echo "... install-app"
 	@echo "... mctp-bridge"
 	@echo "... sermctp"
+	@echo "... test_runner"
 .PHONY : help
 
 

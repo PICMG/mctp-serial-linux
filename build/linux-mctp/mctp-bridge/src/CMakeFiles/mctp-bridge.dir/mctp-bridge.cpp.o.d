@@ -1,4 +1,4 @@
-mctp-bridge-src/CMakeFiles/mctp-bridge.dir/__/src/mctp-bridge.cpp.o: \
+linux-mctp/mctp-bridge/src/CMakeFiles/mctp-bridge.dir/mctp-bridge.cpp.o: \
  /home/doug/git/mctp-serial-linux/linux-mctp/mctp-bridge/src/mctp-bridge.cpp \
  /usr/include/stdc-predef.h \
  /home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/src/../include/sermctp/MctpBridge.hpp \

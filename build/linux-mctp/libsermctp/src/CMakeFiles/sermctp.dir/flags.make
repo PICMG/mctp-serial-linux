@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -DSERMCTP_BUILDING -Dsermctp_EXPORTS
 
-CXX_INCLUDES = -I/usr/include/libnl3 -I/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/src/../include -I/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/src/../include/sermctp -I/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/src
+CXX_INCLUDES = -I/usr/include/libnl3 -I/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/src/../include -I/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/src/../include/sermctp -I/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/src -I/home/doug/git/mctp-serial-linux/linux-mctp/libsermctp/src/../tests
 
-CXX_FLAGS = -std=gnu++17 -fPIC -fvisibility=hidden -fPIC
+CXX_FLAGS = -std=gnu++17 -fPIC -fPIC
 
