@@ -1,0 +1,5 @@
+# Ignore any build directories anywhere in the repo
+# Matches `build/` at repo root and any nested `build/` directories
+build/
+**/build/
+**/build/**
