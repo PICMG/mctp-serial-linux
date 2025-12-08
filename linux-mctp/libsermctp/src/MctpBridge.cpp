@@ -6,6 +6,21 @@
  * by configuring a TTY device with the MCTP line discipline, monitoring the creation
  * and removal of associated mctpserial network interfaces, and managing terminal settings.
  *
+ * `open()` now accepts an optional `use_id_path_tag` flag. When
+ * `use_id_path_tag` is true the `tty_path` argument is treated as an
+ * `ID_PATH_TAG` udev identifier and the bridge will instantiate a
+ * `ManagedUsbTty` helper which monitors udev and binds to the physical USB
+ * tty matching the provided ID. In that mode the bridge uses the duplicated
+ * PTY slave fd returned by `ManagedUsbTty::open()` as the serial fd.
+ *
+ * Note on ID_PATH_TAG
+ * -------------------
+ * The udev property `ID_PATH_TAG` identifies the physical path of a USB
+ * device (the bus topology) and is used by this implementation to match a
+ * stable identifier for the target serial device. To query `ID_PATH_TAG` on
+ * the command line for a device node, run:
+ *    udevadm info -q property -n /dev/ttyUSB0 | grep -E '^(ID_PATH_TAG)='
+ *
  * @author Doug Sandy (doug@picmg.org)
  * @license MIT No Attribution (MIT-0)
  *
@@ -17,6 +32,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
  */
 #include "sermctp/detail/MctpBridge_impl.hpp"
+#include "sermctp/detail/ManagedUsbTty.hpp"
 #include <iostream>
 #include <stdexcept>
 #include <chrono>
@@ -80,9 +96,10 @@ MctpBridge::~MctpBridge() {
  *                 this reflects the desired name for the inerface.  It must be unique across the system.
  * @param local_eid Local Endpoint ID for the MCTP interface.
  * @param peer_eids Vector of peer Endpoint IDs for the MCTP interface. 
+ * @param use_id_path_tag true to interpret tty_path as an ID_PATH_TAG for ManagedUsbTty usage.
  * @return true on success, otherwise failure.
  */
-bool MctpBridge::open(const std::string& tty_path, BaudRate baud, bool hw_flow_control, uint8_t local_eid, std::vector<uint8_t> peer_eids) {
+bool MctpBridge::open(const std::string& tty_path, BaudRate baud, bool hw_flow_control, uint8_t local_eid, std::vector<uint8_t> peer_eids, bool use_id_path_tag) {
     // close if already configured.  this also stops the routing thread
     close();
 
@@ -100,56 +117,94 @@ bool MctpBridge::open(const std::string& tty_path, BaudRate baud, bool hw_flow_c
         return false;
     }
 
-    // connect to the physical interface
-    // Open and configure the physical TTY here (MctpBridge owns TTY config).
-    int fd = ::open(tty_path.c_str(), O_RDWR | O_NOCTTY);
-    if (fd < 0) {
-        std::cout << "MctpBridge failed to open TTY device\n";
-        close();
-        return false;
-    }
-    
-    // Configure termios as requested by caller
-    struct termios tty;
-    if (tcgetattr(fd, &tty) != 0) {
-        ::close(fd);
-        close();
-        return false;
-    }
-    cfsetospeed(&tty, static_cast<speed_t>(baud));
-    cfsetispeed(&tty, static_cast<speed_t>(baud));
-    // Input flags - clear processing and disable software flow control
-    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
-    // Output flags - disable post-processing
-    tty.c_oflag &= ~OPOST;
-    // Control flags - set 8N1
-    tty.c_cflag &= ~(CSIZE | PARENB);
-    tty.c_cflag |= CS8;
-    // Local flags - disable echo and canonical
-    tty.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-    // Hardware flow control
-    if (!hw_flow_control) {
-        tty.c_cflag &= ~CRTSCTS;
+    int fd = -1;
+    int pipefd = -1;
+
+    if (!use_id_path_tag) {
+        // connect to the physical interface
+        // Open and configure the physical TTY here (MctpBridge owns TTY config).
+        fd = ::open(tty_path.c_str(), O_RDWR | O_NOCTTY);
+        if (fd < 0) {
+            std::cerr << "MctpBridge failed to open TTY device\n";
+            close();
+            return false;
+        }
+
+        // Configure termios as requested by caller
+        struct termios tty;
+        if (tcgetattr(fd, &tty) != 0) {
+            ::close(fd);
+            close();
+            return false;
+        }
+        cfsetospeed(&tty, static_cast<speed_t>(baud));
+        cfsetispeed(&tty, static_cast<speed_t>(baud));
+        // Input flags - clear processing and disable software flow control
+        tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+        // Output flags - disable post-processing
+        tty.c_oflag &= ~OPOST;
+        // Control flags - set 8N1
+        tty.c_cflag &= ~(CSIZE | PARENB);
+        tty.c_cflag |= CS8;
+        // Local flags - disable echo and canonical
+        tty.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+        // Hardware flow control
+        if (!hw_flow_control) {
+            tty.c_cflag &= ~CRTSCTS;
+        } else {
+            tty.c_cflag |= CRTSCTS;
+        }
+
+        if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+            ::close(fd);
+            close();
+            return false;
+        }
+
+        // Attach the configured fd to our framer so it can start processing.
+        pipefd = mctpSerial.openFd(fd);
+        if (pipefd < 0) {
+            ::close(fd);
+            close();
+            return false;
+        }
+        // Keep the original TTY fd for cleanup, but select() on the framer wake pipe
+        tty_raw_fd = fd;
+        tty_fd = pipefd;
     } else {
-        tty.c_cflag |= CRTSCTS;
-    }
+        // Use ManagedUsbTty: the passed string is the ID_PATH_TAG
+        try {
+            managedUsb = std::make_unique<sermctp::detail::ManagedUsbTty>();
+        } catch (...) {
+            std::cerr << "MctpBridge: failed to allocate ManagedUsbTty\n";
+            close();
+            return false;
+        }
 
-    if (tcsetattr(fd, TCSANOW, &tty) != 0) {
-        ::close(fd);
-        close();
-        return false;
-    }
+        int slave_dup = managedUsb->open(tty_path, static_cast<int>(baud), hw_flow_control);
+        if (slave_dup < 0) {
+            std::cerr << "MctpBridge: ManagedUsbTty failed to open ID_PATH_TAG='" << tty_path << "'\n";
+            managedUsb.reset();
+            close();
+            return false;
+        }
 
-    // Attach the configured fd to our framer so it can start processing.
-    int pipefd = mctpSerial.openFd(fd);
-    if (pipefd < 0) {
-        ::close(fd);
-        close();
-        return false;
+        // Attach duplicated slave fd to framer
+        pipefd = mctpSerial.openFd(slave_dup);
+        if (pipefd < 0) {
+            std::cerr << "MctpBridge: mctpSerial.openFd failed for ManagedUsbTty slave fd\n";
+            // stop managedUsb and close the duplicate
+            managedUsb->close();
+            ::close(slave_dup);
+            managedUsb.reset();
+            close();
+            return false;
+        }
+
+        // The bridge owns the dupfd for cleanup
+        tty_raw_fd = slave_dup;
+        tty_fd = pipefd;
     }
-    // Keep the original TTY fd for cleanup, but select() on the framer wake pipe
-    tty_raw_fd = fd;
-    tty_fd = pipefd;
 
     int linux_fd_diag = linuxEndpoint.getIsRxReadyFd();
     int framer_serial_fd = mctpSerial.getSerialFd();
@@ -177,6 +232,12 @@ void MctpBridge::close() {
 
      
     // close the original TTY fd (framer close() will close the duplicated fd and pipes)
+    // If we used ManagedUsbTty, stop it first so it shuts down worker and master fd
+    if (managedUsb) {
+        managedUsb->close();
+        managedUsb.reset();
+    }
+
     if (tty_raw_fd>=0) {
         ::close(tty_raw_fd);
         tty_raw_fd = -1;
