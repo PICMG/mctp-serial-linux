@@ -13,6 +13,7 @@ The script requires root privileges to create AF_MCTP sockets.
 
 Usage: run from repository root:
     python3 mctp-bridge/examples/python_mctp_bridge_example.py --tty /dev/pts/X --local-eid 8 --remote-eid 9
+    python3 mctp-bridge/examples/python_mctp_bridge_example.py --id-path-tag "pci-0000:00:14.0-usb-0:3:1.0" --local-eid 8 --remote-eid 9
 
 Author: Doug Sandy <doug@picmg.org>
 License: MIT No Attribution (MIT-0)
@@ -113,7 +114,9 @@ def pack_sockaddr_mctp(eid, typ=1, tag=0, network=0, family=AF_MCTP):
 # set up the main interactive loop and loop until ctrl-c typed
 def run():
     parser = argparse.ArgumentParser(description="AF_MCTP interactive example")
-    parser.add_argument("--tty", required=True, help="TTY path to pass to mctp-bridge (required)")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--tty", help="TTY path to pass to mctp-bridge (e.g. /dev/ttyUSB0)")
+    group.add_argument("--id-path-tag", help="udev ID_PATH_TAG to monitor instead of a tty path")
     parser.add_argument("--local-eid", type=int, default=8, help="Local EID to bind/send from (default: 8)")
     parser.add_argument("--remote-eid", type=int, default=9, help="Remote EID to send datagrams to (default: 9)")
     args = parser.parse_args()
@@ -126,8 +129,13 @@ def run():
     # launch the bridge.
     bridge_exe = "mctp-bridge"
     proc = None
-    chosen_tty = args.tty
-    cmd = [bridge_exe, "--tty", chosen_tty, "--local-eid", str(args.local_eid), "--remote-eid", str(args.remote_eid)]
+    # Determine whether to launch bridge with a tty path or an ID_PATH_TAG
+    if args.id_path_tag:
+        chosen_device = args.id_path_tag
+        cmd = [bridge_exe, "--id-path-tag", chosen_device, "--local-eid", str(args.local_eid), "--remote-eid", str(args.remote_eid)]
+    else:
+        chosen_device = args.tty
+        cmd = [bridge_exe, "--tty", chosen_device, "--local-eid", str(args.local_eid), "--remote-eid", str(args.remote_eid)]
     print("Launching mctp-bridge...")
     try:
         proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)    

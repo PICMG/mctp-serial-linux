@@ -43,10 +43,11 @@ struct CmdOptions {
     std::string tty;
     std::optional<BaudRate> baud;   // std::nullopt if not provided
     bool hwflow = false;            // default false
-    std::optional<std::string> ifname;
+    std::optional<std::string> ifname;       // desired MCTP interface name
+    std::optional<std::string> id_path_tag;  // ID_PATH_TAG (mutually exclusive with ifname)
     std::optional<int> local_eid;
     std::optional<int> remote_eid;
-};  
+};
 
 /*
  * @brief Handle signals (e.g., SIGINT, SIGTERM) by setting the interrupted flag.
@@ -100,15 +101,18 @@ void printUsage(const char* progName) {
     std::cout << "  --baud <baud-string>    Baud rate string (e.g. B9600, B115200). If omitted, default B115200 is used\n";
     std::cout << "  --hwflow <TRUE|FALSE>   Hardware flow control. TRUE to enable RTS/CTS, FALSE (default) to disable.\n";
     std::cout << "  --ifname <name>         Name of MCTP interface for socket connections (e.g. mctp0). Default: use linux-assigned name.\n";
+    std::cout << "  --id-path-tag <tag>     Use the udev ID_PATH_TAG identifier instead of a physical tty path.\n";
     std::cout << "  --local-eid <n>         Local endpoint ID (1-254). If not specified, the bridge is transparent.\n";
     std::cout << "  --help                  Show this help message and exit.\n\n";
 
     std::cout << "Examples:\n";
     std::cout << "  " << progName << " --tty /dev/ttyUSB0 --remote-eid 8 --baud B115200 --hwflow TRUE --ifname mctp0\n";
-    std::cout << "  " << progName << " --tty /dev/ttyS1 --remote-eid 8\n\n";
+    std::cout << "  " << progName << " --id-path-tag 'pci-0000:00:14.0-usb-0:3:1.0' --remote-eid 8 --baud B115200 --hwflow TRUE\n\n";
 
     std::cout << "Notes:\n";
     std::cout << "  - The code is blocking and will run until iterrupted with SIGINT.\n";
+    std::cout << "  - To determine the ID_PATH_TAG for a device node (e.g. /dev/ttyUSB0) run:\n";
+    std::cout << "      udevadm info -q property -n /dev/ttyUSB0 | grep -E '^(ID_PATH_TAG)='\n";
     std::cout << std::flush;
 }
 
@@ -164,6 +168,7 @@ std::optional<CmdOptions> parseArgs(int argc, char** argv) {
         {"baud",    required_argument, nullptr, 'b'},
         {"hwflow",  required_argument, nullptr, 'f'},
         {"ifname",  required_argument, nullptr, 'i'},
+        {"id-path-tag", required_argument, nullptr, 'p'},
         {"local-eid", required_argument, nullptr, 'L'},
         {"remote-eid",  required_argument, nullptr, 'R'},
         {"help",    no_argument,       nullptr, 'h'},
@@ -176,7 +181,7 @@ std::optional<CmdOptions> parseArgs(int argc, char** argv) {
 
     int opt;
     int longIndex = 0;
-    while ((opt = getopt_long(argc, argv, "t:b:f:i:L:R:h", longOpts, &longIndex)) != -1) {
+    while ((opt = getopt_long(argc, argv, "t:b:f:i:p:L:R:h", longOpts, &longIndex)) != -1) {
         switch (opt) {
         case 't':
             opts.tty = optarg;
@@ -205,6 +210,9 @@ std::optional<CmdOptions> parseArgs(int argc, char** argv) {
         case 'i':
             opts.ifname = std::string(optarg);
             break;
+        case 'p':
+            opts.id_path_tag = std::string(optarg);
+            break;
         case 'L': {
             int v = atoi(optarg);
             if (v < 1 || v > 254) {
@@ -232,9 +240,16 @@ std::optional<CmdOptions> parseArgs(int argc, char** argv) {
         }
     }
 
-    // Validate required options
-    if (!seenTty) {
-        std::cerr << "Missing required option: --tty\n";
+    // Validate required options: require either a tty path or an id-path-tag
+    if (!seenTty && !opts.id_path_tag.has_value()) {
+        std::cerr << "Missing required option: --tty or --id-path-tag\n";
+        printUsage(argv[0]);
+        return std::nullopt;
+    }
+
+    // --ifname and --id-path-tag are mutually exclusive
+    if (opts.ifname && opts.id_path_tag) {
+        std::cerr << "Options --ifname and --id-path-tag are mutually exclusive\n";
         printUsage(argv[0]);
         return std::nullopt;
     }
@@ -271,14 +286,32 @@ int main(int argc, char *argv[]) {
     BaudRate baud = BaudRate::BR_115200;
     if (opts.baud) baud = *opts.baud;
 
-    if (!mctpbridge.open(opts.tty.c_str(), baud, opts.hwflow, 
-                opts.local_eid ? static_cast<uint8_t>(*opts.local_eid) : 0,{static_cast<uint8_t>(*opts.remote_eid)})) {
-        std::cerr << "Failed to open serial bridge on " << opts.tty << "\n";
+    // Determine whether we are using an ID_PATH_TAG or a direct TTY path
+    std::string device_spec;
+    bool use_id_path_tag = false;
+    if (opts.id_path_tag) {
+        device_spec = *opts.id_path_tag;
+        use_id_path_tag = true;
+    } else {
+        device_spec = opts.tty;
+    }
+
+    if (!mctpbridge.open(device_spec, baud, opts.hwflow,
+                opts.local_eid ? static_cast<uint8_t>(*opts.local_eid) : 0,{static_cast<uint8_t>(*opts.remote_eid)}, use_id_path_tag)) {
+        if (use_id_path_tag) {
+            std::cerr << "Failed to open serial bridge for ID_PATH_TAG '" << device_spec << "'\n";
+        } else {
+            std::cerr << "Failed to open serial bridge on " << device_spec << "\n";
+        }
         return EXIT_FAILURE;
     }
     // show the bridge configuration
     std::cout << "MCTP Bridge running:\n";
-    std::cout << "  TTY device: " << opts.tty << "\n";
+    if (use_id_path_tag) {
+        std::cout << "  ID_PATH_TAG: " << device_spec << "\n";
+    } else {
+        std::cout << "  TTY device: " << device_spec << "\n";
+    }
     std::cout << "  Baud rate: ";
     if (opts.baud) {
         std::cout << static_cast<int>(*(opts.baud)) << "\n";
