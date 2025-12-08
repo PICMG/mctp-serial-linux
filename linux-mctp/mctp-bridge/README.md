@@ -22,6 +22,10 @@ The bridge sits in user space with three logical links:
 
 - Port 1 — Kernel MCTP: a kernel-visible `mctp-serial<N>` interface. Kernel-land AF_MCTP sockets send unicast packets here and the kernel routes packets to the correct interface based on destination EID.  Optionally this interface may be renamed by command line arguments when the mctp-bridge is instantialed.
 - Port 2 — Serial Transport: the physical serial device (e.g. `/dev/ttyUSB0`). The bridge encodes and decodes MCTP frames to/from this link.
+Special handling is important in the case of a ttyUSB device since these devices are not persistent in the device map, and ttyUSB device names are not tied to specific ports.  Instead of using device names, the MctpBridge provides an alternate way of binding to usb-serial devices that uses the udev ID_PATH_ID, which provides a one-to-one correspondance with a specific output port as long as the system configuration is not changed (e.g. adding additional ports through hubs).  This capability offers two distinct benefts:
+  - a mappable correspondance between MctpBridge and a specific pysical usb connector (useful for maintainance)
+  - ability to recover when a ttyUSB device is removed and reinserted.  Based on the ID_PATH_TAG, newly discovered devices can be unambiguously associated with the physical port they were inserted in regardless of the name they are assigned. 
+
 - Port 3 — Broadcast interface that user-space processes use to send and receive broadcast MCTP messages via the bridge.  The name of this interface always matches the name of the kernel-facing interface, but prepended by `bcast`
 
 These three pieces let user processes talk to remote MCTP endpoints (unicast) via the kernel stack and participate in broadcast exchanges via the bridge's UNIX datagram socket.
@@ -61,6 +65,40 @@ See the top of the example script for more detailed usage notes and command-line
 ```bash
 sudo ./mctp-bridge --tty /dev/ttyUSB0 --ifname testbridge --baud B115200 --local-eid 8 --remote_eid 9 
 ```
+
+### Using the Python example with an ID_PATH_TAG
+
+The bridge and the Python example support binding to a persistent USB port identifier instead of a transient device node. Use `--id-path-tag` to select a physical USB port by its `ID_PATH_TAG` (mutually exclusive with `--tty`). Example:
+
+```bash
+# run the python example and bind by ID_PATH_TAG
+sudo python3 mctp-bridge/examples/python_mctp_bridge_example.py \
+  --id-path-tag pci-0000_00_14_0-usb-0_6_1_0 \
+  --local_eid 8 --remote_eid 9
+```
+
+How to determine the `ID_PATH_TAG` for an installed device
+
+You can get the `ID_PATH_TAG` for a plugged-in USB serial device using `udevadm` or by inspecting the `by-path` symlinks. Replace `/dev/ttyUSB0` with the device node you have:
+
+```bash
+# show the device properties and grep the tag
+udevadm info -q property -n /dev/ttyUSB0 | grep '^ID_PATH_TAG='
+
+# or list by-path entries to see which device maps to which physical path
+ls -l /dev/serial/by-path
+
+# iterate all ttyUSB devices and print their ID_PATH_TAG (useful when multiple present)
+for d in /dev/ttyUSB*; do
+  echo "Device: $d"
+  udevadm info -q property -n "$d" | grep '^ID_PATH_TAG=' || true
+done
+```
+
+Notes:
+- `--id-path-tag` is mutually exclusive with `--tty`; pick one form of binding when starting the bridge or the Python helper script.
+- The `ID_PATH_TAG` string comes from udev and typically looks like `pci-0000_00_14_0-usb-0_6_1_0` on many systems.
+
 
 ## Developer view
 

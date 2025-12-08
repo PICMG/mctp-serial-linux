@@ -27,6 +27,12 @@ include_directories(${LIBNL3_INCLUDE_DIRS})
 link_directories(${LIBNL3_LIBRARY_DIRS})
 add_definitions(${LIBNL3_CFLAGS_OTHER})
 
+# libudev is required when ManagedUsbTty is used; link it unconditionally
+pkg_check_modules(LIBUDEV REQUIRED libudev)
+include_directories(${LIBUDEV_INCLUDE_DIRS})
+link_directories(${LIBUDEV_LIBRARY_DIRS})
+add_definitions(${LIBUDEV_CFLAGS_OTHER})
+
 # Collect sources (explicit listing is preferred long-term)
 file(GLOB_RECURSE MCTP_SRCS CONFIGURE_DEPENDS "*.cpp" "*.c")
 
@@ -139,7 +145,7 @@ if(BUILD_STATIC_LIBS)
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   )
 endif()
-target_link_libraries(sermctp PUBLIC ${LIBNL3_LIBRARIES})
+target_link_libraries(sermctp PUBLIC ${LIBNL3_LIBRARIES} ${LIBUDEV_LIBRARIES})
 
 if(BUILD_TESTS)
   # When building tests in-tree, expose the tests/ headers to the build so

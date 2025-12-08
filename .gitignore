@@ -1,0 +1,17 @@
+# Ignore any build directories anywhere in the repo
+# Matches `build/` at repo root and any nested `build/` directories
+build/
+**/build/
+**/build/**
+
+# CTest / CMake test temporary files and logs
+# Ignore test run temporary directories and common log files created by CTest
+build/Testing/
+**/Testing/
+Testing/Temporary/
+**/Testing/Temporary/
+LastTest.log
+CTestCostData.txt
+
+# Ignore core test artifacts that may be created by other test tools
+*.log

@@ -13,6 +13,7 @@ The script requires root privileges to create AF_MCTP sockets.
 
 Usage: run from repository root:
     python3 mctp-bridge/examples/python_mctp_bridge_example.py --tty /dev/pts/X --local-eid 8 --remote-eid 9
+    python3 mctp-bridge/examples/python_mctp_bridge_example.py --id-path-tag "pci-0000:00:14.0-usb-0:3:1.0" --local-eid 8 --remote-eid 9
 
 Author: Doug Sandy <doug@picmg.org>
 License: MIT No Attribution (MIT-0)
@@ -113,7 +114,9 @@ def pack_sockaddr_mctp(eid, typ=1, tag=0, network=0, family=AF_MCTP):
 # set up the main interactive loop and loop until ctrl-c typed
 def run():
     parser = argparse.ArgumentParser(description="AF_MCTP interactive example")
-    parser.add_argument("--tty", required=True, help="TTY path to pass to mctp-bridge (required)")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--tty", help="TTY path to pass to mctp-bridge (e.g. /dev/ttyUSB0)")
+    group.add_argument("--id-path-tag", help="udev ID_PATH_TAG to monitor instead of a tty path")
     parser.add_argument("--local-eid", type=int, default=8, help="Local EID to bind/send from (default: 8)")
     parser.add_argument("--remote-eid", type=int, default=9, help="Remote EID to send datagrams to (default: 9)")
     args = parser.parse_args()
@@ -123,17 +126,39 @@ def run():
         print("Re-executing under sudo for privileged operations...")
         os.execvp("sudo", ["sudo", sys.executable] + sys.argv)
 
-    # launch the bridge.
-    bridge_exe = "mctp-bridge"
+    # launch the bridge. Try to find `mctp-bridge` in PATH first, then
+    # fall back to the in-tree build path (useful when running from source).
+    import shutil
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    repo_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
+    build_candidate = os.path.join(repo_root, 'build', 'linux-mctp', 'mctp-bridge', 'src', 'mctp-bridge')
+    bridge_exe = shutil.which('mctp-bridge') or (build_candidate if os.path.isfile(build_candidate) and os.access(build_candidate, os.X_OK) else None)
     proc = None
-    chosen_tty = args.tty
-    cmd = [bridge_exe, "--tty", chosen_tty, "--local-eid", str(args.local_eid), "--remote-eid", str(args.remote_eid)]
-    print("Launching mctp-bridge...")
+    # Determine whether to launch bridge with a tty path or an ID_PATH_TAG
+    if args.id_path_tag:
+        chosen_device = args.id_path_tag
+        cmd = [bridge_exe, "--id-path-tag", chosen_device, "--local-eid", str(args.local_eid), "--remote-eid", str(args.remote_eid)]
+    else:
+        chosen_device = args.tty
+        cmd = [bridge_exe, "--tty", chosen_device, "--local-eid", str(args.local_eid), "--remote-eid", str(args.remote_eid)]
+    if not bridge_exe:
+        print("mctp-bridge executable not found in PATH or build tree. Build it or add to PATH.", file=sys.stderr)
+        sys.exit(1)
+
+    cmd[0] = bridge_exe
+    print("Launching mctp-bridge... (executable=", bridge_exe, ")")
     try:
-        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)    
+        # Launch bridge but hide its stdout/stderr so example output remains clean.
+        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except Exception as e:
         print(f"Failed to launch mctp-bridge: {e}", file=sys.stderr)
-    time.sleep(5)  # brief pause to allow bridge to initialize
+        sys.exit(1)
+
+    # wait a short moment to let the bridge initialize and print startup info
+    time.sleep(0.2)
+    if proc.poll() is not None:
+        print("mctp-bridge exited early", file=sys.stderr)
+        sys.exit(1)
 
     # create AF_MCTP sockets using libc
     bridge_fd = libc.socket(AF_MCTP, socket.SOCK_DGRAM, 0)
