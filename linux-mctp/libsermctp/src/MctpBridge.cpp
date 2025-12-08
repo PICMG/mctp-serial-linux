@@ -103,24 +103,30 @@ bool MctpBridge::open(const std::string& tty_path, BaudRate baud, bool hw_flow_c
     // close if already configured.  this also stops the routing thread
     close();
 
-    this->ifname = linuxEndpoint.initialize(ifname,local_eid,peer_eids);
-    if (this->ifname.empty()) {
-        std::cout << "MctpBridge LinuxMctpEndpoint initialization failed\n";
-        close();
-        return false;
-    } 
-    
-    this->broadcastName = "/tmp/bcast_"+this->ifname+".sock";
-    if (!bcast->open(broadcastName)) {
-        std::cout << "MctpBridge broadcast setup failed\n";
-        close();
-        return false;
-    }
+    this->broadcastName.clear();
+
+    // We'll initialize the Linux MCTP endpoint below once we know whether
+    // we're using a direct TTY or an ID_PATH_TAG-backed ManagedUsbTty.
 
     int fd = -1;
     int pipefd = -1;
 
     if (!use_id_path_tag) {
+        // Initialize Linux endpoint using a fresh PTY master created by LinuxMctpSerial
+        try {
+            this->ifname = linuxEndpoint.initialize(ifname, local_eid, peer_eids);
+        } catch (...) {
+            std::cerr << "MctpBridge LinuxMctpEndpoint initialization failed\n";
+            close();
+            return false;
+        }
+
+        this->broadcastName = "/tmp/bcast_"+this->ifname+".sock";
+        if (!bcast->open(broadcastName)) {
+            std::cout << "MctpBridge broadcast setup failed\n";
+            close();
+            return false;
+        }
         // connect to the physical interface
         // Open and configure the physical TTY here (MctpBridge owns TTY config).
         fd = ::open(tty_path.c_str(), O_RDWR | O_NOCTTY);
@@ -184,6 +190,29 @@ bool MctpBridge::open(const std::string& tty_path, BaudRate baud, bool hw_flow_c
         int slave_dup = managedUsb->open(tty_path, static_cast<int>(baud), hw_flow_control);
         if (slave_dup < 0) {
             std::cerr << "MctpBridge: ManagedUsbTty failed to open ID_PATH_TAG='" << tty_path << "'\n";
+            managedUsb.reset();
+            close();
+            return false;
+        }
+        // Initialize Linux endpoint as a decoupled kernel-side interface
+        // (LinuxMctpSerial creates its own PTY and manages the kernel mctpserial
+        // device). Keep LinuxMctpSerial independent of ManagedUsbTty.
+        try {
+            this->ifname = linuxEndpoint.initialize(ifname, local_eid, peer_eids);
+        } catch (...) {
+            std::cerr << "MctpBridge LinuxMctpEndpoint initialization failed\n";
+            managedUsb->close();
+            ::close(slave_dup);
+            managedUsb.reset();
+            close();
+            return false;
+        }
+
+        this->broadcastName = "/tmp/bcast_"+this->ifname+".sock";
+        if (!bcast->open(broadcastName)) {
+            std::cout << "MctpBridge broadcast setup failed\n";
+            managedUsb->close();
+            ::close(slave_dup);
             managedUsb.reset();
             close();
             return false;

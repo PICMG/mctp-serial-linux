@@ -126,8 +126,13 @@ def run():
         print("Re-executing under sudo for privileged operations...")
         os.execvp("sudo", ["sudo", sys.executable] + sys.argv)
 
-    # launch the bridge.
-    bridge_exe = "mctp-bridge"
+    # launch the bridge. Try to find `mctp-bridge` in PATH first, then
+    # fall back to the in-tree build path (useful when running from source).
+    import shutil
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    repo_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
+    build_candidate = os.path.join(repo_root, 'build', 'linux-mctp', 'mctp-bridge', 'src', 'mctp-bridge')
+    bridge_exe = shutil.which('mctp-bridge') or (build_candidate if os.path.isfile(build_candidate) and os.access(build_candidate, os.X_OK) else None)
     proc = None
     # Determine whether to launch bridge with a tty path or an ID_PATH_TAG
     if args.id_path_tag:
@@ -136,12 +141,24 @@ def run():
     else:
         chosen_device = args.tty
         cmd = [bridge_exe, "--tty", chosen_device, "--local-eid", str(args.local_eid), "--remote-eid", str(args.remote_eid)]
-    print("Launching mctp-bridge...")
+    if not bridge_exe:
+        print("mctp-bridge executable not found in PATH or build tree. Build it or add to PATH.", file=sys.stderr)
+        sys.exit(1)
+
+    cmd[0] = bridge_exe
+    print("Launching mctp-bridge... (executable=", bridge_exe, ")")
     try:
-        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)    
+        # Launch bridge but hide its stdout/stderr so example output remains clean.
+        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except Exception as e:
         print(f"Failed to launch mctp-bridge: {e}", file=sys.stderr)
-    time.sleep(5)  # brief pause to allow bridge to initialize
+        sys.exit(1)
+
+    # wait a short moment to let the bridge initialize and print startup info
+    time.sleep(0.2)
+    if proc.poll() is not None:
+        print("mctp-bridge exited early", file=sys.stderr)
+        sys.exit(1)
 
     # create AF_MCTP sockets using libc
     bridge_fd = libc.socket(AF_MCTP, socket.SOCK_DGRAM, 0)
